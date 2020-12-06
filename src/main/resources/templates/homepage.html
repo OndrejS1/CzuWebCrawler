@@ -1,0 +1,74 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" lang="cs">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<meta name="description" content="Prezentace nejpodstatnějších dat PEF ČZU">
+	<title>PEF TV</title>
+	<meta http-equiv="refresh" content="3600">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css" integrity="sha256-l85OmPOjvil/SOvVt3HnSSjzF1TUMyT9eV0c2BzEGzU=" crossorigin="anonymous" />
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+	<style th:inline="text">
+        body{font-family:'Roboto',sans-serif;background:#f6f8f9}
+        *,*::before,*::after {box-sizing: border-box}
+        h1,h2 {margin:0;padding:.67em 0;font-weight:300;text-align:center;background:#ba1f33;color:#fff}
+        h2 {border-top-left-radius:10px;border-top-right-radius:10px}
+        .grid {display:grid;grid-gap:10px;grid-template-columns:repeat(auto-fill, minmax(600px,1fr));grid-auto-rows:20px}
+        .block{margin:15px}
+        .content{box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);border-bottom-left-radius:10px;border-bottom-right-radius:10px}
+        .flex-container {display: flex;flex-wrap: wrap}
+        .col-1{flex:0 0 8.33%;max-width:8.33%} .col-2{flex:0 0 16.66%;max-width:16.66%} .col-3{max-width:25%;flex:0 0 25%}
+        .col-4{max-width:33.33%;flex:0 0 33.33%} .col-5{max-width:41.66%;flex:0 0 41.66%} .col-6{max-width:50%;flex:0 0 50%}
+        .col-7{max-width:58.33%;flex:0 0 58.33%} .col-8{max-width:66.66%;flex:0 0 66.66%} .col-9{max-width:75%;flex:0 0 75%}
+        .col-10{max-width:83.33%;flex:0 0 83.33%} .col-11{max-width:91.66%;flex:0 0 91.66%} .col-12{max-width:100%;flex:0 0 100%}
+        .block-subhead{background: #fff;box-shadow: inset 0 -2px 2px 0 rgba(0,0,0,.2)} .block-subhead p{margin:0;padding:10px 15px;color:#309293;font-weight:300;font-size:1.4em}
+        .block-line {background:#fff;border-bottom:#e3e1e1 2px solid;font-size:1.2em} .block .block-line:last-child{border-bottom:unset;border-bottom-left-radius:10px;border-bottom-right-radius:10px}
+        .block-line p{margin:0;padding:10px 15px} .text-center{text-align:center;width:100%}.text-light{font-weight:300;color:#61717e} .price{color:#6cc17d;font-weight:600}
+	</style>
+</head>
+<body>
+<h1 th:if="${#lists.isEmpty(foods) or foods == null}">Nabídka jídel je momentalne nedostupna</h1>
+<div th:each="listFoods: ${foods}">
+	<h1 th:if="${#lists.isEmpty(listFoods.getProviderMenus())}">Dne <span th:text="${listFoods.getMenuDate()}"></span> chybí denní nabídka jídel</h1>
+	<h1 th:unless="${#lists.isEmpty(listFoods.getProviderMenus())}">Nabídka jídel dne <span th:text="${listFoods.getMenuDate()}"></span></h1>
+	<div class="grid">
+		<div class="block" th:each="providerMenus: ${listFoods.getProviderMenus()}">
+			<div class="content">
+				<h2 th:text="${providerMenus.getProvider()}">Jídlo</h2>
+				<div class="block-subhead flex-container">
+					<div class="col-8"><p>Jídlo</p></div>
+					<div class="col-2"><p>Dotované</p></div>
+					<div class="col-2"><p>Cena</p></div>
+				</div>
+				<div th:each="food: ${providerMenus.menuLists}" class="block-line flex-container">
+					<div class="col-8"><p th:text="${food.getName()}">Hovězí vývar s celestýnskými nudlemi  A: 1a,3,7</p></div>
+					<div class="col-2"><p th:text="${food.getStudentPrice()} + ' Kč'" class="price">10 Kč</p></div>
+					<div class="col-2"><p th:text="${food.getFullPrice()} + ' Kč'" class="text-light">19 Kč</p></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+        function resizeGridItem(item){
+            grid = document.getElementsByClassName("grid")[0];
+            rowHeight = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-auto-rows'));
+            rowGap = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-row-gap'));
+            rowSpan = Math.ceil((item.querySelector('.content').getBoundingClientRect().height+rowGap)/(rowHeight+rowGap));
+            item.style.gridRowEnd = "span "+rowSpan;
+        }
+
+        function resizeAllGridItems(){
+            allItems = document.getElementsByClassName("block");
+            for(x=0;x<allItems.length;x++){
+                resizeGridItem(allItems[x]);
+            }
+        }
+
+        window.onload = resizeAllGridItems();
+        window.addEventListener("resize", resizeAllGridItems);
+
+        allItems = document.getElementsByClassName("block");
+	</script>
+</div>
+</body>
+</html>
